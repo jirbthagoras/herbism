@@ -1,0 +1,522 @@
+"use client"
+
+import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion"
+import { useState, useEffect } from "react"
+import Image from "next/image"
+import Link from "next/link"
+import { useTheme } from "../context/ThemeContext"
+import { Home, MessageCircle, ScanLine, Sprout, Users, User, Leaf, ShieldAlert } from "lucide-react"
+
+export default function Navbar() {
+  const [isScrolled, setIsScrolled] = useState(false)
+  const [activeSection, setActiveSection] = useState("home")
+  const [showScanDropdown, setShowScanDropdown] = useState(false)
+  const [showMobileScanMenu, setShowMobileScanMenu] = useState(false)
+  const [showMobileAkunMenu, setShowMobileAkunMenu] = useState(false)
+  const [isLoggedIn, setIsLoggedIn] = useState(false) // Simulate login state
+  const [userName, setUserName] = useState("") // User name when logged in
+  const { scrollY } = useScroll()
+  const navbarOpacity = useTransform(scrollY, [0, 100], [0.95, 1])
+  const { getThemeColors } = useTheme()
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 50)
+    }
+
+    window.addEventListener("scroll", handleScroll)
+    return () => window.removeEventListener("scroll", handleScroll)
+  }, [])
+
+  const desktopNavItems = [
+    { id: "home", label: "Home", icon: Home },
+    { id: "konsultasi", label: "Konsultasi", icon: MessageCircle },
+    { id: "scan", label: "Scan", icon: ScanLine, hasDropdown: true },
+    { id: "rawat", label: "Rawat", icon: Sprout },
+    { id: "wireless", label: "Wireless", icon: Users }
+  ]
+
+  const mobileNavLeft = [
+    { id: "home", label: "Home", icon: Home },
+    { id: "konsultasi", label: "Konsultasi", icon: MessageCircle }
+  ]
+
+  const mobileNavRight = [
+    { id: "wireless", label: "Wireless", icon: Users },
+    { id: "akun", label: "Akun", icon: User, hasDropdown: true }
+  ]
+
+  const centerFAB = { id: "scan", label: "Scan", icon: ScanLine, hasDropdown: true }
+
+  const scanOptions = [
+    { id: "scan-manfaat", label: "Scan Manfaat", icon: Leaf, description: "Identifikasi manfaat tanaman" },
+    { id: "scan-penyakit", label: "Scan Penyakit", icon: ShieldAlert, description: "Diagnosa penyakit tanaman" }
+  ]
+
+  const akunOptions = [
+    { id: "rawat", label: "Rawat Tanaman", icon: Sprout, description: "Kelola perawatan tanaman" },
+    { id: "dashboard", label: "Dashboard Akun", icon: User, description: "Profil & pengaturan" }
+  ]
+
+  const scrollToSection = (sectionId: string) => {
+    setActiveSection(sectionId)
+    setShowMobileScanMenu(false)
+    setShowMobileAkunMenu(false)
+    // Implement scroll logic here
+  }
+
+  const themeColors = getThemeColors()
+
+  return (
+    <>
+      <motion.nav
+        style={{ opacity: navbarOpacity }}
+        className={`hidden md:block fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
+          isScrolled
+            ? "bg-white/90 backdrop-blur-xl shadow-lg border-b border-emerald-100"
+            : "bg-transparent"
+        }`}
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16 md:h-20">
+            {/* Logo kek gmana asu asu jembut */}
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6 }}
+              className="flex items-center"
+            >
+              <Image src="/Logo.png" alt="Logo" width={40} height={40} />
+            </motion.div>
+
+            {/* Desktop Navigation */}
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="flex items-center gap-1"
+            >
+              {desktopNavItems.map((item, index) => (
+                <div 
+                  key={item.id} 
+                  className="relative"
+                  onMouseEnter={() => item.hasDropdown && setShowScanDropdown(true)}
+                  onMouseLeave={() => item.hasDropdown && setShowScanDropdown(false)}
+                >
+                  <motion.button
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4, delay: 0.1 * index }}
+                    onClick={() => !item.hasDropdown && scrollToSection(item.id)}
+                    className="relative px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-300"
+                    style={{
+                      color: activeSection === item.id ? "white" : isScrolled ? "#334155" : "#1e293b"
+                    }}
+                    onMouseEnter={(e) => {
+                      if (activeSection !== item.id) {
+                        e.currentTarget.style.color = themeColors.primary
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (activeSection !== item.id) {
+                        e.currentTarget.style.color = isScrolled ? "#334155" : "#1e293b"
+                      }
+                    }}
+                  >
+                    {activeSection === item.id && (
+                      <motion.div
+                        layoutId="activeTab"
+                        className={`absolute inset-0 bg-gradient-to-r ${themeColors.gradient} rounded-full shadow-lg`}
+                        transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                      />
+                    )}
+                    <span className="relative z-10 flex items-center gap-2">
+                      <span className="text-base">{item.label}</span>
+                    </span>
+                  </motion.button>
+
+                  {/* Dropdown Menu Mobel */}
+                  {item.hasDropdown && (
+                    <AnimatePresence>
+                      {showScanDropdown && (
+                        <motion.div
+                          initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                          animate={{ opacity: 1, y: 0, scale: 1 }}
+                          exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                          transition={{ duration: 0.2 }}
+                          className="absolute top-full mt-2 left-1/2 -translate-x-1/2 w-64 bg-white rounded-2xl shadow-2xl border overflow-hidden"
+                          style={{ borderColor: `${themeColors.primary}20` }}
+                        >
+                          {scanOptions.map((option, idx) => (
+                            <motion.button
+                              key={option.id}
+                              onClick={() => scrollToSection(option.id)}
+                              className="w-full px-4 py-3 flex items-start gap-3 transition-all duration-200 hover:bg-slate-50"
+                              whileHover={{ x: 4 }}
+                              style={{
+                                borderBottom: idx === 0 ? `1px solid ${themeColors.primary}10` : 'none'
+                              }}
+                            >
+                              <div 
+                                className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
+                                style={{ background: `${themeColors.primary}15` }}
+                              >
+                                <option.icon size={20} style={{ color: themeColors.primary }} />
+                              </div>
+                              <div className="flex-1 text-left">
+                                <div className="text-sm font-medium text-slate-900">{option.label}</div>
+                                <div className="text-xs text-slate-500 mt-0.5">{option.description}</div>
+                              </div>
+                            </motion.button>
+                          ))}
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  )}
+                </div>
+              ))}
+            </motion.div>
+
+            {/* Account Desktop */}
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+            >
+              {isLoggedIn ? (
+                // User Buttotn
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => scrollToSection("akun")}
+                  className="flex items-center gap-2 px-4 py-2 rounded-full bg-slate-100 hover:bg-slate-200 transition-all duration-300"
+                >
+                  <div 
+                    className="w-8 h-8 rounded-full flex items-center justify-center text-white font-medium text-sm"
+                    style={{ background: `linear-gradient(135deg, ${themeColors.primary}, ${themeColors.secondary})` }}
+                  >
+                    {userName ? userName.charAt(0).toUpperCase() : "U"}
+                  </div>
+                  <span className="text-sm font-medium text-slate-700">
+                    {userName || "User"}
+                  </span>
+                </motion.button>
+              ) : (
+                // Login/Register Buttons
+                <div className="flex items-center gap-2">
+                  <Link href="/login">
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      className="px-5 py-2 text-sm font-medium text-slate-700 hover:text-slate-900 rounded-full transition-all duration-300"
+                    >
+                      Masuk
+                    </motion.button>
+                  </Link>
+                  <Link href="/register">
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      className="px-5 py-2 text-sm text-white rounded-full font-medium shadow-lg hover:shadow-xl transition-all duration-300"
+                      style={{ background: `linear-gradient(135deg, ${themeColors.primary}, ${themeColors.secondary})` }}
+                    >
+                      Daftar
+                    </motion.button>
+                  </Link>
+                </div>
+              )}
+            </motion.div>
+          </div>
+        </div>
+      </motion.nav>
+
+      {/* Mobile Bottom */}
+      <motion.nav
+        initial={{ y: 100, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.6, delay: 0.3 }}
+        className="md:hidden fixed bottom-0 left-0 right-0 z-50"
+      >
+        {/* Scan POPUP */}
+        <AnimatePresence>
+          {showMobileScanMenu && (
+            <>
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                onClick={() => setShowMobileScanMenu(false)}
+                className="fixed inset-0 bg-black/20 backdrop-blur-sm"
+                style={{ bottom: '80px' }}
+              />
+              
+              <motion.div
+                initial={{ opacity: 0, y: 20, scale: 0.9 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 20, scale: 0.9 }}
+                transition={{ type: "spring", stiffness: 300, damping: 25 }}
+                className="absolute bottom-20 left-1/2 -translate-x-1/2 w-[calc(100%-2rem)] max-w-sm bg-white rounded-3xl shadow-2xl border overflow-hidden"
+                style={{ borderColor: `${themeColors.primary}20` }}
+              >
+                <div className="p-2">
+                  {scanOptions.map((option, idx) => (
+                    <motion.button
+                      key={option.id}
+                      onClick={() => scrollToSection(option.id)}
+                      className="w-full px-4 py-4 flex items-center gap-4 rounded-2xl transition-all duration-200"
+                      whileTap={{ scale: 0.98 }}
+                      style={{
+                        background: idx === 0 ? `${themeColors.primary}08` : 'transparent'
+                      }}
+                    >
+                      <div 
+                        className="w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-sm"
+                        style={{ background: `linear-gradient(135deg, ${themeColors.primary}20, ${themeColors.secondary}20)` }}
+                      >
+                        <option.icon size={24} style={{ color: themeColors.primary }} strokeWidth={2} />
+                      </div>
+                      <div className="flex-1 text-left">
+                        <div className="text-sm font-semibold text-slate-900">{option.label}</div>
+                        <div className="text-xs text-slate-500 mt-1">{option.description}</div>
+                      </div>
+                    </motion.button>
+                  ))}
+                </div>
+              </motion.div>
+            </>
+          )}
+        </AnimatePresence>
+
+        {/* Akun POP UP */}
+        <AnimatePresence>
+          {showMobileAkunMenu && (
+            <>
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                onClick={() => setShowMobileAkunMenu(false)}
+                className="fixed inset-0 bg-black/20 backdrop-blur-sm"
+                style={{ bottom: '80px' }}
+              />
+              
+              <motion.div
+                initial={{ opacity: 0, y: 20, scale: 0.9 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 20, scale: 0.9 }}
+                transition={{ type: "spring", stiffness: 300, damping: 25 }}
+                className="absolute bottom-20 right-4 w-[calc(100%-2rem)] max-w-xs bg-white rounded-3xl shadow-2xl border overflow-hidden"
+                style={{ borderColor: `${themeColors.primary}20` }}
+              >
+                <div className="p-2">
+                  {akunOptions.map((option, idx) => (
+                    <motion.button
+                      key={option.id}
+                      onClick={() => scrollToSection(option.id)}
+                      className="w-full px-4 py-4 flex items-center gap-4 rounded-2xl transition-all duration-200"
+                      whileTap={{ scale: 0.98 }}
+                      style={{
+                        background: idx === 0 ? `${themeColors.primary}08` : 'transparent'
+                      }}
+                    >
+                      <div 
+                        className="w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-sm"
+                        style={{ background: `linear-gradient(135deg, ${themeColors.primary}20, ${themeColors.secondary}20)` }}
+                      >
+                        <option.icon size={24} style={{ color: themeColors.primary }} strokeWidth={2} />
+                      </div>
+                      <div className="flex-1 text-left">
+                        <div className="text-sm font-semibold text-slate-900">{option.label}</div>
+                        <div className="text-xs text-slate-500 mt-1">{option.description}</div>
+                      </div>
+                    </motion.button>
+                  ))}
+                </div>
+              </motion.div>
+            </>
+          )}
+        </AnimatePresence>
+
+        <div className="relative">
+          <div className="absolute inset-0 bg-gradient-to-t from-white via-white/95 to-transparent pointer-events-none" />
+          
+          <div className="relative bg-white/95 backdrop-blur-xl border-t shadow-2xl" style={{ borderColor: `${themeColors.primary}15` }}>
+            <div className="max-w-md mx-auto px-4 py-2">
+              <div className="flex items-center justify-between relative">
+                
+                {/* Left Nav*/}
+                <div className="flex items-center pr-12 flex-1 justify-around">
+                  {mobileNavLeft.map((item, index) => {
+                    const isActive = activeSection === item.id
+                    return (
+                      <motion.button
+                        key={item.id}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.4, delay: 0.1 * index }}
+                        onClick={() => {
+                          setShowMobileScanMenu(false)
+                          setShowMobileAkunMenu(false)
+                          scrollToSection(item.id)
+                        }}
+                        whileTap={{ scale: 0.9 }}
+                        className="relative flex flex-col items-center gap-1 py-2 px-3"
+                      >
+                        {isActive && (
+                          <motion.div
+                            layoutId="mobileActiveTab"
+                            className={`absolute -top-1 left-1/2 -translate-x-1/2 w-10 h-1 bg-gradient-to-r ${themeColors.gradient} rounded-full`}
+                            transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                          />
+                        )}
+                        
+                        <motion.div
+                          animate={{
+                            scale: isActive ? 1.1 : 1,
+                            y: isActive ? -2 : 0
+                          }}
+                          transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                          className={`relative flex items-center justify-center w-11 h-11 rounded-2xl transition-all duration-300 ${
+                            isActive
+                              ? `bg-gradient-to-br ${themeColors.gradient} shadow-lg`
+                              : "bg-slate-100"
+                          }`}
+                        >
+                          <item.icon 
+                            className={`transition-all duration-300 ${
+                              isActive ? "text-white" : "text-slate-600"
+                            }`}
+                            size={20}
+                            strokeWidth={2.5}
+                          />
+                        </motion.div>
+                        
+                        <motion.span
+                          animate={{
+                            fontWeight: isActive ? 600 : 500
+                          }}
+                          className="text-[9px] leading-tight text-center transition-colors duration-300"
+                          style={{
+                            color: isActive ? themeColors.primary : "#64748b"
+                          }}
+                        >
+                          {item.label}
+                        </motion.span>
+                      </motion.button>
+                    )
+                  })}
+                </div>
+
+                {/* Center FAB - Scan Button */}
+                <motion.button
+                  initial={{ opacity: 0, scale: 0 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.5, delay: 0.2, type: "spring" }}
+                  onClick={() => {
+                    setShowMobileAkunMenu(false)
+                    setShowMobileScanMenu(!showMobileScanMenu)
+                  }}
+                  whileTap={{ scale: 0.9 }}
+                  className="absolute left-1/2 -translate-x-1/2 -top-6 z-10"
+                >
+                  <motion.div
+                    animate={{
+                      rotate: showMobileScanMenu ? 45 : 0,
+                      scale: showMobileScanMenu ? 1.05 : 1
+                    }}
+                    transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                    className="w-14 h-14 rounded-2xl shadow-2xl flex items-center justify-center"
+                    style={{ 
+                      background: `linear-gradient(135deg, ${themeColors.primary}, ${themeColors.secondary})` 
+                    }}
+                  >
+                    <ScanLine className="text-white" size={24} strokeWidth={2.5} />
+                  </motion.div>
+                  <span 
+                    className="absolute -bottom-5 left-1/2 -translate-x-1/2 text-[9px] font-medium whitespace-nowrap"
+                    style={{ color: themeColors.primary }}
+                  >
+                    Scan
+                  </span>
+                </motion.button>
+
+                {/* Right Nav */}
+                <div className="flex items-center gap-2 flex-1 justify-around">
+                  {mobileNavRight.map((item, index) => {
+                    const isActive = activeSection === item.id
+                    return (
+                      <motion.button
+                        key={item.id}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.4, delay: 0.1 * (index + 2) }}
+                        onClick={() => {
+                          if (item.hasDropdown) {
+                            setShowMobileScanMenu(false)
+                            setShowMobileAkunMenu(!showMobileAkunMenu)
+                          } else {
+                            setShowMobileScanMenu(false)
+                            setShowMobileAkunMenu(false)
+                            scrollToSection(item.id)
+                          }
+                        }}
+                        whileTap={{ scale: 0.9 }}
+                        className="relative flex flex-col items-center gap-1 py-2 px-3"
+                      >
+                        {isActive && (
+                          <motion.div
+                            layoutId="mobileActiveTab"
+                            className={`absolute -top-1 left-1/2 -translate-x-1/2 w-10 h-1 bg-gradient-to-r ${themeColors.gradient} rounded-full`}
+                            transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                          />
+                        )}
+                        
+                        <motion.div
+                          animate={{
+                            scale: isActive ? 1.1 : showMobileAkunMenu && item.hasDropdown ? 1.1 : 1,
+                            y: isActive ? -2 : 0
+                          }}
+                          transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                          className={`relative flex items-center justify-center w-11 h-11 rounded-2xl transition-all duration-300 ${
+                            isActive
+                              ? `bg-gradient-to-br ${themeColors.gradient} shadow-lg`
+                              : showMobileAkunMenu && item.hasDropdown
+                              ? "bg-slate-200"
+                              : "bg-slate-100"
+                          }`}
+                        >
+                          <item.icon 
+                            className={`transition-all duration-300 ${
+                              isActive ? "text-white" : "text-slate-600"
+                            }`}
+                            size={20}
+                            strokeWidth={2.5}
+                          />
+                        </motion.div>
+                        
+                        <motion.span
+                          animate={{
+                            fontWeight: isActive ? 600 : 500
+                          }}
+                          className="text-[9px] leading-tight text-center transition-colors duration-300"
+                          style={{
+                            color: isActive ? themeColors.primary : "#64748b"
+                          }}
+                        >
+                          {item.label}
+                        </motion.span>
+                      </motion.button>
+                    )
+                  })}
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </div>
+      </motion.nav>
+
+
+    </>
+  )
+}
