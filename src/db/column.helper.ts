@@ -6,3 +6,11 @@ export const timestamps = {
 };
 
 export const roleEnum = t.pgEnum("roles", ["user"]);
+
+export const experienceLevelEnum = t.pgEnum("experience_level", [
+  "beginner",
+  "intermediate",
+  "expert",
+]);
+
+export const genderEnum = t.pgEnum("gender", ["male", "female"]);
