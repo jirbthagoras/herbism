@@ -1,6 +1,7 @@
 import * as t from "drizzle-orm/pg-core";
-import { users } from "./user.schema";
+import { user } from "./user.schema";
 import { experienceLevelEnum, genderEnum, timestamps } from "./column.helper";
+import { relations } from "drizzle-orm";
 
 /*
 
@@ -13,7 +14,8 @@ pilihan yang tepat.
 */
 
 export const profile = t.pgTable("profiles", {
-  userId: t.integer().references((): t.AnyPgColumn => users.id),
+  id: t.integer().primaryKey().generatedAlwaysAsIdentity(),
+  userId: t.integer().references((): t.AnyPgColumn => user.id),
   age: t.integer().notNull(),
   gender: genderEnum().notNull(),
   region: t.varchar().notNull(),
@@ -23,3 +25,10 @@ export const profile = t.pgTable("profiles", {
   experienceLevel: experienceLevelEnum().notNull(),
   ...timestamps,
 });
+
+export const profileRelation = relations(profile, ({ one }) => ({
+  user: one(user, {
+    fields: [profile.userId],
+    references: [user.id],
+  }),
+}));
