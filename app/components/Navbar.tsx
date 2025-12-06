@@ -75,11 +75,10 @@ export default function Navbar() {
     <>
       <motion.nav
         style={{ opacity: navbarOpacity }}
-        className={`hidden md:block fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-          isScrolled
+        className={`hidden md:block fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${isScrolled
             ? "bg-white/95 backdrop-blur-xl shadow-lg border-b border-emerald-100/50"
             : "bg-white/80 backdrop-blur-md"
-        }`}
+          }`}
       >
         <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
           <div className="flex items-center justify-between h-11 md:h-22">
@@ -90,7 +89,7 @@ export default function Navbar() {
               className="flex items-center gap-1"
             >
               <div className="relative">
-                <HerbismLogo 
+                <HerbismLogo
                   color={themeColors.primary}
                   className="w-28 h-auto"
                 />
@@ -105,8 +104,8 @@ export default function Navbar() {
               className="flex items-center gap-1"
             >
               {desktopNavItems.map((item, index) => (
-                <div 
-                  key={item.id} 
+                <div
+                  key={item.id}
                   className="relative"
                   onMouseEnter={() => item.hasDropdown && setShowScanDropdown(true)}
                   onMouseLeave={() => item.hasDropdown && setShowScanDropdown(false)}
@@ -171,7 +170,7 @@ export default function Navbar() {
                                 e.currentTarget.style.backgroundColor = 'transparent'
                               }}
                             >
-                              <div 
+                              <div
                                 className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm"
                                 style={{ background: `${themeColors.primary}18` }}
                               >
@@ -225,7 +224,7 @@ export default function Navbar() {
                         <div className="p-4 border-b" style={{ borderColor: `${themeColors.primary}15` }}>
                           <p className="text-sm font-semibold text-slate-900">{user.name || user.username}</p>
                           <p className="text-xs text-slate-500 mt-0.5">{user.email}</p>
-                        </div>                
+                        </div>
                         <div className="p-2">
                           <Link href="/profile">
                             <motion.button
@@ -236,12 +235,12 @@ export default function Navbar() {
                               <span className="text-sm font-medium text-slate-700">Profil Saya</span>
                             </motion.button>
                           </Link>
-                          
+
                           <motion.button
                             whileHover={{ x: 4 }}
                             onClick={async () => {
                               await logout()
-                              router.push("/home")
+                              router.push("/")
                             }}
                             className="w-full px-4 py-3 flex items-center gap-3 rounded-xl transition-all duration-200 hover:bg-red-50"
                           >
@@ -314,7 +313,7 @@ export default function Navbar() {
                 className="fixed inset-0 bg-black/20 backdrop-blur-sm"
                 style={{ bottom: '80px' }}
               />
-              
+
               <motion.div
                 initial={{ opacity: 0, y: 20, scale: 0.9 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -334,7 +333,7 @@ export default function Navbar() {
                         background: idx === 0 ? `${themeColors.primary}08` : 'transparent'
                       }}
                     >
-                      <div 
+                      <div
                         className="w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-sm"
                         style={{ background: `linear-gradient(135deg, ${themeColors.primary}20, ${themeColors.secondary}20)` }}
                       >
@@ -364,7 +363,7 @@ export default function Navbar() {
                 className="fixed inset-0 bg-black/20 backdrop-blur-sm"
                 style={{ bottom: '80px' }}
               />
-              
+
               <motion.div
                 initial={{ opacity: 0, y: 20, scale: 0.9 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -384,7 +383,7 @@ export default function Navbar() {
                         background: idx === 0 ? `${themeColors.primary}08` : 'transparent'
                       }}
                     >
-                      <div 
+                      <div
                         className="w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-sm"
                         style={{ background: `linear-gradient(135deg, ${themeColors.primary}20, ${themeColors.secondary}20)` }}
                       >
@@ -404,11 +403,11 @@ export default function Navbar() {
 
         <div className="relative">
           <div className="absolute inset-0 bg-gradient-to-t from-white via-white/95 to-transparent pointer-events-none" />
-          
+
           <div className="relative bg-white/98 backdrop-blur-xl border-t-2 shadow-2xl" style={{ borderColor: `${themeColors.primary}20` }}>
             <div className="max-w-md mx-auto px-4 py-2">
               <div className="flex items-center justify-between relative">
-                
+
                 {/* Left Nav*/}
                 <div className="flex items-center pr-12 flex-1 justify-around">
                   {mobileNavLeft.map((item, index) => {
@@ -434,28 +433,26 @@ export default function Navbar() {
                             transition={{ type: "spring", stiffness: 300, damping: 30 }}
                           />
                         )}
-                        
+
                         <motion.div
                           animate={{
                             scale: isActive ? 1.1 : 1,
                             y: isActive ? -2 : 0
                           }}
                           transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                          className={`relative flex items-center justify-center w-11 h-11 rounded-2xl transition-all duration-300 ${
-                            isActive
+                          className={`relative flex items-center justify-center w-11 h-11 rounded-2xl transition-all duration-300 ${isActive
                               ? `bg-gradient-to-br ${themeColors.gradient} shadow-lg`
                               : "bg-slate-100"
-                          }`}
-                        >
-                          <item.icon 
-                            className={`transition-all duration-300 ${
-                              isActive ? "text-white" : "text-slate-600"
                             }`}
+                        >
+                          <item.icon
+                            className={`transition-all duration-300 ${isActive ? "text-white" : "text-slate-600"
+                              }`}
                             size={20}
                             strokeWidth={2.5}
                           />
                         </motion.div>
-                        
+
                         <motion.span
                           animate={{
                             fontWeight: isActive ? 600 : 500
@@ -491,13 +488,13 @@ export default function Navbar() {
                     }}
                     transition={{ type: "spring", stiffness: 300, damping: 20 }}
                     className="w-14 h-14 rounded-2xl shadow-2xl flex items-center justify-center"
-                    style={{ 
-                      background: `linear-gradient(135deg, ${themeColors.primary}, ${themeColors.secondary})` 
+                    style={{
+                      background: `linear-gradient(135deg, ${themeColors.primary}, ${themeColors.secondary})`
                     }}
                   >
                     <ScanLine className="text-white" size={24} strokeWidth={2.5} />
                   </motion.div>
-                  <span 
+                  <span
                     className="absolute -bottom-5 left-1/2 -translate-x-1/2 text-[9px] font-medium whitespace-nowrap"
                     style={{ color: themeColors.primary }}
                   >
@@ -535,30 +532,28 @@ export default function Navbar() {
                             transition={{ type: "spring", stiffness: 300, damping: 30 }}
                           />
                         )}
-                        
+
                         <motion.div
                           animate={{
                             scale: isActive ? 1.1 : showMobileAkunMenu && item.hasDropdown ? 1.1 : 1,
                             y: isActive ? -2 : 0
                           }}
                           transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                          className={`relative flex items-center justify-center w-11 h-11 rounded-2xl transition-all duration-300 ${
-                            isActive
+                          className={`relative flex items-center justify-center w-11 h-11 rounded-2xl transition-all duration-300 ${isActive
                               ? `bg-gradient-to-br ${themeColors.gradient} shadow-lg`
                               : showMobileAkunMenu && item.hasDropdown
-                              ? "bg-slate-200"
-                              : "bg-slate-100"
-                          }`}
-                        >
-                          <item.icon 
-                            className={`transition-all duration-300 ${
-                              isActive ? "text-white" : "text-slate-600"
+                                ? "bg-slate-200"
+                                : "bg-slate-100"
                             }`}
+                        >
+                          <item.icon
+                            className={`transition-all duration-300 ${isActive ? "text-white" : "text-slate-600"
+                              }`}
                             size={20}
                             strokeWidth={2.5}
                           />
                         </motion.div>
-                        
+
                         <motion.span
                           animate={{
                             fontWeight: isActive ? 600 : 500

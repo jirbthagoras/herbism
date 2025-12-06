@@ -19,9 +19,9 @@ interface ProfileFormData {
   age: number | ""
   gender: Gender | ""
   region: string
-  healthCondition: string
-  healthGoals: string
-  allergies: string
+  healthCondition: string[]
+  healthGoals: string[]
+  allergies: string[]
   experienceLevel: ExperienceLevel | ""
 }
 
@@ -39,9 +39,9 @@ export default function CompleteProfilePage() {
     age: "",
     gender: "",
     region: "",
-    healthCondition: "",
-    healthGoals: "",
-    allergies: "",
+    healthCondition: [],
+    healthGoals: [],
+    allergies: [],
     experienceLevel: ""
   })
 
@@ -53,20 +53,20 @@ export default function CompleteProfilePage() {
   // Common health conditions
   const healthConditions = [
     "Diabetes", "Hipertensi", "Asma", "Alergi", "Jantung",
-    "Kolesterol", "Asam Urat", "Maag", "Tidak Ada", "Lainnya (tulis sendiri)"
+    "Kolesterol", "Asam Urat", "Maag", "Tidak Ada"
   ]
 
   // Health goals
   const healthGoalsList = [
     "Menurunkan Berat Badan", "Meningkatkan Imunitas", "Detoksifikasi",
     "Mengurangi Stress", "Meningkatkan Energi", "Tidur Lebih Baik",
-    "Kesehatan Pencernaan", "Kesehatan Jantung", "Lainnya (tulis sendiri)"
+    "Kesehatan Pencernaan", "Kesehatan Jantung"
   ]
 
   // Common allergies
   const allergiesList = [
     "Kacang", "Susu", "Telur", "Seafood", "Gluten",
-    "Kedelai", "Gandum", "Tidak Ada Alergi", "Lainnya (tulis sendiri)"
+    "Kedelai", "Gandum", "Tidak Ada Alergi"
   ]
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -87,15 +87,9 @@ export default function CompleteProfilePage() {
         age: typeof formData.age === 'number' ? formData.age : undefined,
         gender: formData.gender || undefined,
         region: formData.region,
-        healthCondition: formData.healthCondition === "Lainnya (tulis sendiri)"
-          ? customHealthCondition
-          : formData.healthCondition,
-        healthGoals: formData.healthGoals === "Lainnya (tulis sendiri)"
-          ? customHealthGoal
-          : formData.healthGoals,
-        allergies: formData.allergies === "Lainnya (tulis sendiri)"
-          ? customAllergy
-          : formData.allergies,
+        healthCondition: formData.healthCondition.length > 0 ? formData.healthCondition : undefined,
+        healthGoals: formData.healthGoals.length > 0 ? formData.healthGoals : undefined,
+        allergies: formData.allergies.length > 0 ? formData.allergies : undefined,
         experienceLevel: formData.experienceLevel || undefined
       }
 
@@ -260,8 +254,8 @@ export default function CompleteProfilePage() {
                         type="button"
                         onClick={() => setFormData({ ...formData, gender: option.value as Gender })}
                         className={`px-4 py-3 rounded-2xl border-2 transition-all font-medium ${formData.gender === option.value
-                            ? 'border-emerald-500 bg-emerald-50 text-emerald-700'
-                            : 'border-slate-200 hover:border-slate-300 text-slate-700'
+                          ? 'border-emerald-500 bg-emerald-50 text-emerald-700'
+                          : 'border-slate-200 hover:border-slate-300 text-slate-700'
                           }`}
                       >
                         {option.label}
@@ -291,17 +285,55 @@ export default function CompleteProfilePage() {
             {step === 2 && (
               <div className="space-y-6">
                 <h2 className="text-2xl font-medium text-slate-900 mb-2">Kondisi Kesehatan</h2>
-                <p className="text-sm text-slate-600 mb-6">Pilih satu kondisi kesehatan yang Anda miliki</p>
+                <p className="text-sm text-slate-600 mb-6">Pilih kondisi kesehatan yang Anda miliki (bisa lebih dari satu)</p>
+
+                {/* Selected Tags */}
+                {formData.healthCondition.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mb-4 p-4 bg-emerald-50 rounded-2xl">
+                    {formData.healthCondition.map((condition) => (
+                      <div
+                        key={condition}
+                        className="px-3 py-1.5 bg-white rounded-full border-2 border-emerald-500 text-emerald-700 text-sm font-medium flex items-center gap-2"
+                      >
+                        {condition}
+                        <button
+                          type="button"
+                          onClick={() => setFormData({
+                            ...formData,
+                            healthCondition: formData.healthCondition.filter(c => c !== condition)
+                          })}
+                          className="hover:bg-emerald-100 rounded-full p-0.5"
+                        >
+                          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                          </svg>
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
 
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                   {healthConditions.map((condition) => (
                     <button
                       key={condition}
                       type="button"
-                      onClick={() => setFormData({ ...formData, healthCondition: condition })}
-                      className={`px-4 py-3 rounded-2xl border-2 transition-all text-sm font-medium ${formData.healthCondition === condition
-                          ? 'border-emerald-500 bg-emerald-50 text-emerald-700'
-                          : 'border-slate-200 hover:border-slate-300 text-slate-700'
+                      onClick={() => {
+                        if (formData.healthCondition.includes(condition)) {
+                          setFormData({
+                            ...formData,
+                            healthCondition: formData.healthCondition.filter(c => c !== condition)
+                          })
+                        } else {
+                          setFormData({
+                            ...formData,
+                            healthCondition: [...formData.healthCondition, condition]
+                          })
+                        }
+                      }}
+                      className={`px-4 py-3 rounded-2xl border-2 transition-all text-sm font-medium ${formData.healthCondition.includes(condition)
+                        ? 'border-emerald-500 bg-emerald-50 text-emerald-700'
+                        : 'border-slate-200 hover:border-slate-300 text-slate-700'
                         }`}
                     >
                       {condition}
@@ -309,23 +341,53 @@ export default function CompleteProfilePage() {
                   ))}
                 </div>
 
-                {/* input kustom */}
-                {formData.healthCondition === "Lainnya (tulis sendiri)" && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: "auto" }}
-                    className="mt-4"
-                  >
+                {/* Custom input */}
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  className="mt-4"
+                >
+                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                    Tambah kondisi lainnya (opsional)
+                  </label>
+                  <div className="flex gap-2">
                     <input
                       type="text"
                       value={customHealthCondition}
                       onChange={(e) => setCustomHealthCondition(e.target.value)}
-                      className="w-full px-4 py-3 rounded-2xl border border-emerald-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none transition-all"
+                      className="flex-1 px-4 py-3 rounded-2xl border border-slate-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none transition-all"
                       placeholder="Tuliskan kondisi kesehatan Anda"
-                      required
+                      onKeyPress={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault()
+                          if (customHealthCondition.trim() && !formData.healthCondition.includes(customHealthCondition.trim())) {
+                            setFormData({
+                              ...formData,
+                              healthCondition: [...formData.healthCondition, customHealthCondition.trim()]
+                            })
+                            setCustomHealthCondition("")
+                          }
+                        }
+                      }}
                     />
-                  </motion.div>
-                )}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (customHealthCondition.trim() && !formData.healthCondition.includes(customHealthCondition.trim())) {
+                          setFormData({
+                            ...formData,
+                            healthCondition: [...formData.healthCondition, customHealthCondition.trim()]
+                          })
+                          setCustomHealthCondition("")
+                        }
+                      }}
+                      className="px-6 py-3 rounded-2xl text-white font-medium shadow-lg hover:shadow-xl transition-all"
+                      style={{ backgroundColor: primaryColor }}
+                    >
+                      Tambah
+                    </button>
+                  </div>
+                </motion.div>
               </div>
             )}
 
@@ -333,17 +395,55 @@ export default function CompleteProfilePage() {
             {step === 3 && (
               <div className="space-y-6">
                 <h2 className="text-2xl font-medium text-slate-900 mb-2">Tujuan Kesehatan</h2>
-                <p className="text-sm text-slate-600 mb-6">Pilih satu tujuan kesehatan Anda</p>
+                <p className="text-sm text-slate-600 mb-6">Pilih tujuan kesehatan Anda (bisa lebih dari satu)</p>
+
+                {/* Selected Tags */}
+                {formData.healthGoals.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mb-4 p-4 bg-emerald-50 rounded-2xl">
+                    {formData.healthGoals.map((goal) => (
+                      <div
+                        key={goal}
+                        className="px-3 py-1.5 bg-white rounded-full border-2 border-emerald-500 text-emerald-700 text-sm font-medium flex items-center gap-2"
+                      >
+                        {goal}
+                        <button
+                          type="button"
+                          onClick={() => setFormData({
+                            ...formData,
+                            healthGoals: formData.healthGoals.filter(g => g !== goal)
+                          })}
+                          className="hover:bg-emerald-100 rounded-full p-0.5"
+                        >
+                          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                          </svg>
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {healthGoalsList.map((goal) => (
                     <button
                       key={goal}
                       type="button"
-                      onClick={() => setFormData({ ...formData, healthGoals: goal })}
-                      className={`px-4 py-3 rounded-2xl border-2 transition-all text-sm font-medium text-left ${formData.healthGoals === goal
-                          ? 'border-emerald-500 bg-emerald-50 text-emerald-700'
-                          : 'border-slate-200 hover:border-slate-300 text-slate-700'
+                      onClick={() => {
+                        if (formData.healthGoals.includes(goal)) {
+                          setFormData({
+                            ...formData,
+                            healthGoals: formData.healthGoals.filter(g => g !== goal)
+                          })
+                        } else {
+                          setFormData({
+                            ...formData,
+                            healthGoals: [...formData.healthGoals, goal]
+                          })
+                        }
+                      }}
+                      className={`px-4 py-3 rounded-2xl border-2 transition-all text-sm font-medium text-left ${formData.healthGoals.includes(goal)
+                        ? 'border-emerald-500 bg-emerald-50 text-emerald-700'
+                        : 'border-slate-200 hover:border-slate-300 text-slate-700'
                         }`}
                     >
                       {goal}
@@ -351,23 +451,53 @@ export default function CompleteProfilePage() {
                   ))}
                 </div>
 
-                {/* input kustom */}
-                {formData.healthGoals === "Lainnya (tulis sendiri)" && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: "auto" }}
-                    className="mt-4"
-                  >
+                {/* Custom input */}
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  className="mt-4"
+                >
+                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                    Tambah tujuan lainnya (opsional)
+                  </label>
+                  <div className="flex gap-2">
                     <input
                       type="text"
                       value={customHealthGoal}
                       onChange={(e) => setCustomHealthGoal(e.target.value)}
-                      className="w-full px-4 py-3 rounded-2xl border border-emerald-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none transition-all"
+                      className="flex-1 px-4 py-3 rounded-2xl border border-slate-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none transition-all"
                       placeholder="Tuliskan tujuan kesehatan Anda"
-                      required
+                      onKeyPress={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault()
+                          if (customHealthGoal.trim() && !formData.healthGoals.includes(customHealthGoal.trim())) {
+                            setFormData({
+                              ...formData,
+                              healthGoals: [...formData.healthGoals, customHealthGoal.trim()]
+                            })
+                            setCustomHealthGoal("")
+                          }
+                        }
+                      }}
                     />
-                  </motion.div>
-                )}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (customHealthGoal.trim() && !formData.healthGoals.includes(customHealthGoal.trim())) {
+                          setFormData({
+                            ...formData,
+                            healthGoals: [...formData.healthGoals, customHealthGoal.trim()]
+                          })
+                          setCustomHealthGoal("")
+                        }
+                      }}
+                      className="px-6 py-3 rounded-2xl text-white font-medium shadow-lg hover:shadow-xl transition-all"
+                      style={{ backgroundColor: primaryColor }}
+                    >
+                      Tambah
+                    </button>
+                  </div>
+                </motion.div>
               </div>
             )}
 
@@ -376,17 +506,55 @@ export default function CompleteProfilePage() {
               <div className="space-y-6">
                 <div>
                   <h2 className="text-2xl font-medium text-slate-900 mb-2">Alergi</h2>
-                  <p className="text-sm text-slate-600 mb-4">Pilih salah satu alergi yang Anda miliki</p>
+                  <p className="text-sm text-slate-600 mb-4">Pilih alergi yang Anda miliki (bisa lebih dari satu)</p>
 
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-8">
+                  {/* Selected Tags */}
+                  {formData.allergies.length > 0 && (
+                    <div className="flex flex-wrap gap-2 mb-4 p-4 bg-emerald-50 rounded-2xl">
+                      {formData.allergies.map((allergy) => (
+                        <div
+                          key={allergy}
+                          className="px-3 py-1.5 bg-white rounded-full border-2 border-emerald-500 text-emerald-700 text-sm font-medium flex items-center gap-2"
+                        >
+                          {allergy}
+                          <button
+                            type="button"
+                            onClick={() => setFormData({
+                              ...formData,
+                              allergies: formData.allergies.filter(a => a !== allergy)
+                            })}
+                            className="hover:bg-emerald-100 rounded-full p-0.5"
+                          >
+                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-4">
                     {allergiesList.map((allergy) => (
                       <button
                         key={allergy}
                         type="button"
-                        onClick={() => setFormData({ ...formData, allergies: allergy })}
-                        className={`px-4 py-3 rounded-2xl border-2 transition-all text-sm font-medium ${formData.allergies === allergy
-                            ? 'border-emerald-500 bg-emerald-50 text-emerald-700'
-                            : 'border-slate-200 hover:border-slate-300 text-slate-700'
+                        onClick={() => {
+                          if (formData.allergies.includes(allergy)) {
+                            setFormData({
+                              ...formData,
+                              allergies: formData.allergies.filter(a => a !== allergy)
+                            })
+                          } else {
+                            setFormData({
+                              ...formData,
+                              allergies: [...formData.allergies, allergy]
+                            })
+                          }
+                        }}
+                        className={`px-4 py-3 rounded-2xl border-2 transition-all text-sm font-medium ${formData.allergies.includes(allergy)
+                          ? 'border-emerald-500 bg-emerald-50 text-emerald-700'
+                          : 'border-slate-200 hover:border-slate-300 text-slate-700'
                           }`}
                       >
                         {allergy}
@@ -394,23 +562,53 @@ export default function CompleteProfilePage() {
                     ))}
                   </div>
 
-                  {/* input kustom */}
-                  {formData.allergies === "Lainnya (tulis sendiri)" && (
-                    <motion.div
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: "auto" }}
-                      className="mb-8"
-                    >
+                  {/* Custom input */}
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                    className="mb-8"
+                  >
+                    <label className="block text-sm font-medium text-slate-700 mb-2">
+                      Tambah alergi lainnya (opsional)
+                    </label>
+                    <div className="flex gap-2">
                       <input
                         type="text"
                         value={customAllergy}
                         onChange={(e) => setCustomAllergy(e.target.value)}
-                        className="w-full px-4 py-3 rounded-2xl border border-emerald-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none transition-all"
+                        className="flex-1 px-4 py-3 rounded-2xl border border-slate-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none transition-all"
                         placeholder="Tuliskan alergi Anda"
-                        required
+                        onKeyPress={(e) => {
+                          if (e.key === 'Enter') {
+                            e.preventDefault()
+                            if (customAllergy.trim() && !formData.allergies.includes(customAllergy.trim())) {
+                              setFormData({
+                                ...formData,
+                                allergies: [...formData.allergies, customAllergy.trim()]
+                              })
+                              setCustomAllergy("")
+                            }
+                          }
+                        }}
                       />
-                    </motion.div>
-                  )}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (customAllergy.trim() && !formData.allergies.includes(customAllergy.trim())) {
+                            setFormData({
+                              ...formData,
+                              allergies: [...formData.allergies, customAllergy.trim()]
+                            })
+                            setCustomAllergy("")
+                          }
+                        }}
+                        className="px-6 py-3 rounded-2xl text-white font-medium shadow-lg hover:shadow-xl transition-all"
+                        style={{ backgroundColor: primaryColor }}
+                      >
+                        Tambah
+                      </button>
+                    </div>
+                  </motion.div>
                 </div>
 
                 <div>
@@ -428,14 +626,14 @@ export default function CompleteProfilePage() {
                         type="button"
                         onClick={() => setFormData({ ...formData, experienceLevel: option.value as ExperienceLevel })}
                         className={`w-full px-6 py-4 rounded-2xl border-2 transition-all text-left ${formData.experienceLevel === option.value
-                            ? 'border-emerald-500 bg-emerald-50'
-                            : 'border-slate-200 hover:border-slate-300'
+                          ? 'border-emerald-500 bg-emerald-50'
+                          : 'border-slate-200 hover:border-slate-300'
                           }`}
                       >
                         <div className="flex items-start gap-3">
                           <div className={`w-5 h-5 rounded-full border-2 mt-0.5 flex items-center justify-center ${formData.experienceLevel === option.value
-                              ? 'border-emerald-500 bg-emerald-500'
-                              : 'border-slate-300'
+                            ? 'border-emerald-500 bg-emerald-500'
+                            : 'border-slate-300'
                             }`}>
                             {formData.experienceLevel === option.value && (
                               <div className="w-2 h-2 bg-white rounded-full" />
@@ -474,10 +672,8 @@ export default function CompleteProfilePage() {
                   onClick={nextStep}
                   disabled={
                     (step === 1 && (!formData.username || !formData.name || !formData.age || !formData.gender || !formData.region)) ||
-                    (step === 2 && !formData.healthCondition) ||
-                    (step === 2 && formData.healthCondition === "Lainnya (tulis sendiri)" && !customHealthCondition) ||
-                    (step === 3 && !formData.healthGoals) ||
-                    (step === 3 && formData.healthGoals === "Lainnya (tulis sendiri)" && !customHealthGoal)
+                    (step === 2 && formData.healthCondition.length === 0) ||
+                    (step === 3 && formData.healthGoals.length === 0)
                   }
                   className="flex-1 px-6 py-3 rounded-full text-white font-medium shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                   style={{ backgroundColor: primaryColor }}
@@ -488,8 +684,7 @@ export default function CompleteProfilePage() {
                 <button
                   type="submit"
                   disabled={
-                    !formData.allergies ||
-                    (formData.allergies === "Lainnya (tulis sendiri)" && !customAllergy) ||
+                    formData.allergies.length === 0 ||
                     !formData.experienceLevel
                   }
                   className="flex-1 px-6 py-3 rounded-full text-white font-medium shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
