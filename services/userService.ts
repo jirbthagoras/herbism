@@ -10,9 +10,9 @@ export type User = {
   age?: number;
   gender?: "male" | "female";
   region?: string;
-  healthCondition?: string;
-  healthGoals?: string;
-  allergies?: string;
+  healthCondition?: string[];
+  healthGoals?: string[];
+  allergies?: string[];
   experienceLevel?: "beginner" | "intermediate" | "expert";
 };
 
@@ -41,7 +41,10 @@ export const updateProfile = async (uid: string, data: Partial<User>) => {
 };
 
 // selesaikan onboarding user
-export const completeOnboarding = async (uid: string, onboardingData: Partial<User>) => {
+export const completeOnboarding = async (
+  uid: string,
+  onboardingData: Partial<User>
+) => {
   try {
     const userRef = doc(db, "profiles", uid);
     await updateDoc(userRef, {
@@ -56,7 +59,10 @@ export const completeOnboarding = async (uid: string, onboardingData: Partial<Us
 };
 
 // dengerin perubahan user realtime
-export const listenToUser = (uid: string, callback: (user: User | null) => void) => {
+export const listenToUser = (
+  uid: string,
+  callback: (user: User | null) => void
+) => {
   const userRef = doc(db, "profiles", uid);
   return onSnapshot(userRef, (doc) => {
     if (doc.exists()) {

@@ -24,7 +24,7 @@ function RegisterContent() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Validate password match
     if (formData.password !== formData.confirmPassword) {
       showError(
@@ -194,7 +194,7 @@ function RegisterContent() {
                     e.target.style.background = "#f8fafc80";
                     e.target.style.boxShadow = "none";
                   }}
-                  placeholder="@email.com"
+                  placeholder="email@example.com"
                   required
                 />
               </div>
